@@ -16,29 +16,29 @@ import {
 const items = [
   {
     title: "My Applications",
-    url: "#",
+    url: "/tenant/application",
     icon: File,
   },
   {
     title: "My Payments",
-    url: "#",
+    url: "/tenant/payments",
     icon: CoinsIcon,
   },
   {
     title: "Maintenance Requests",
-    url: "#",
+    url: "/tenant/maintenance",
     icon: PaintRoller,
   },
   {
     title: "Notifications",
-    url: "#",
+    url: "/tenant/notifications",
     icon: Bell,
   },
 ]
 
 export default function TenantSidebar() {
   return (
-    <Sidebar>
+    <Sidebar collapsible="offcanvas">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Tenant</SidebarGroupLabel>

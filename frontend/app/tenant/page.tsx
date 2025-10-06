@@ -1,3 +1,4 @@
 export default function TenantDashboard(){
-    return <div>Tenant Dashboard</div>
+    return <div className="">
+    </div>
 }

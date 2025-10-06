@@ -11,7 +11,7 @@ const propertySchema = new mongoose.Schema({
   images : {type : [String], required : true},
   availabilityStatus : {type : Boolean, required : true},
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'Landlord', required: true },
-  price: { type: Number, required: true },
+  rent: { type: Number, required: true },
 });
 
 const Property = mongoose.model("Property", propertySchema);

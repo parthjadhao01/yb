@@ -16,22 +16,22 @@ import {
 const items = [
   {
     title: "My Properties",
-    url: "#",
+    url: "/landlord/myproperties",
     icon: Home,
   },
   {
     title: "Tenants Applications",
-    url: "#",
+    url: "/landlord/tenantapplication",
     icon: File,
   },
   {
     title: "Rent Management",
-    url: "#",
+    url: "/landlord/rentmanagements",
     icon: HandCoinsIcon,
   },
   {
     title: "Maintenance Requests",
-    url: "#",
+    url: "/landlord/maintenance",
     icon: PaintRoller,
   },
   {

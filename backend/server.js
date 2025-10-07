@@ -7,6 +7,8 @@ import { tenantProtect, landlordProtect, adminProtect } from "./middleware/auth.
 import cors from "cors";
 import connectDb from "./config/db.js";
 import dotenv from "dotenv";
+import Tenant from "./model/tenant.model.js";
+import Landlord from "./model/landlord.model.js";
 
 dotenv.config();
 connectDb();
@@ -19,6 +21,26 @@ app.use((req, res, next) => {
 });
 app.use(express.json());
 app.use(cors({ origin: "*", credentials: true }));
+
+app.get("/api/admin/tenants", async(req, res) => {
+  try {
+    const tenants = await Tenant.find()
+    res.json({tenants});
+  } catch (error) {
+    console.error("Error fetching tenants:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.get("/api/admin/landlords",async(req,res)=>{
+  try {
+    const landlords = await Landlord.find()
+    res.json({landlords});
+  } catch (error) {
+    console.error("Error fetching landlords:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+})
 
 app.use("/api/auth", authRoutes);
 // app.use("/api/admin", adminProtect, adminRoutes);

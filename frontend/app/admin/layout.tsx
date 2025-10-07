@@ -1,21 +1,25 @@
+"use client";
 import React from "react";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { NavUser } from "@/components/NavUser";
+import AdminSidebar from "@/components/AdminSideBar";
+export default function adminnLayout({ children }: { children: React.ReactNode }) {
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white shadow-sm p-4">
-        <div className="container mx-auto flex items-center justify-between">
-          <h2 className="font-bold text-xl">Admin Panel</h2>
-          <nav>
-            <a href="/admin/dashboard" className="mr-4">Dashboard</a>
-            <a href="/admin/users" className="mr-4">Users</a>
-            <a href="/admin/properties" className="mr-4">Properties</a>
-            <a href="/admin/maintenance">Maintenance</a>
-          </nav>
-        </div>
-      </header>
+    return (
+        <SidebarProvider>
+            <SidebarProvider>
+                <AdminSidebar />
+                <main className="w-full">
+                    <div className="border-b flex justify-between items-center px-4 py-2">
+                        <SidebarTrigger />
+                        <div className="w-45">
+                            <NavUser userDetails={{ name: "John Doe", email: "john@example.com", avatar: "https://via.placeholder.com/150", id: "123" }} userType="landlord" />
+                        </div>
+                    </div>
+                    {children}
+                </main>
+            </SidebarProvider>
+        </SidebarProvider>
+    )
 
-      <main className="container mx-auto p-6">{children}</main>
-    </div>
-  );
 }

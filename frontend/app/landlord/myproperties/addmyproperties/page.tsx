@@ -1,28 +1,37 @@
 "use client";
 
+import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import PropertyForm from "@/components/PropertyForm";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { useState } from "react";
 
 export default function AddMyPropertyPage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   // handle form submission
-  const handleAdd = async (data: any) => {
+  const handleAdd = async (formData: FormData) => {
     try {
-      console.log("Creating Property:", data);
+      setLoading(true);
 
-      // TODO: Replace this with your API call to backend
-      // Example:
-      // await axios.post("/api/properties", data);
+      //  Backend API integration
+      const res = await axios.post("http://localhost:3000/api/landlord/postProperty", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
-      alert("Property added successfully!");
-      router.push("/myproperty");
-    } catch (err) {
+      alert(res.data.message || "Property added successfully!");
+      router.push("/landlord/myproperties");
+    } catch (err: any) {
       console.error(err);
-      alert("Error adding property.");
+      alert(err.response?.data?.message || "Error adding property.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -38,18 +47,17 @@ export default function AddMyPropertyPage() {
       </div>
 
       <p className="mb-6 text-muted-foreground">
-        Fill in all the details below to add a new property. Make sure to upload images and select all relevant amenities.
+        Fill in all the details below to add a new property. Upload property images and select amenities.
       </p>
 
-      {/* Card Form */}
+      {/* Form Card */}
       <Card>
         <CardHeader>
           <CardTitle>Property Details</CardTitle>
-          <CardDescription>Provide all necessary information about the property</CardDescription>
+          <CardDescription>Provide complete information about the property</CardDescription>
         </CardHeader>
-
         <CardContent>
-          <PropertyForm onSubmit={handleAdd} />
+          <PropertyForm onSubmit={handleAdd} loading={loading} />
         </CardContent>
       </Card>
     </div>

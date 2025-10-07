@@ -10,10 +10,11 @@ import { Upload } from "lucide-react";
 
 interface PropertyFormProps {
   initialData?: any;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: FormData) => void;
+  loading?: boolean;
 }
 
-export default function PropertyForm({ initialData, onSubmit }: PropertyFormProps) {
+export default function PropertyForm({ initialData, onSubmit, loading }: PropertyFormProps) {
   const [address, setAddress] = useState("");
   const [socityName, setSocityName] = useState("");
   const [BHK, setBHK] = useState<number>(1);
@@ -21,7 +22,7 @@ export default function PropertyForm({ initialData, onSubmit }: PropertyFormProp
   const [furnishingStatus, setFurnishingStatus] = useState("Unfurnished");
   const [amenities, setAmenities] = useState<string[]>([]);
   const [description, setDescription] = useState("");
-  const [price, setPrice] = useState<number>(0);
+  const [rent, setRent] = useState<number>(0);
   const [availabilityStatus, setAvailabilityStatus] = useState(true);
   const [images, setImages] = useState<File[]>([]);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
@@ -38,7 +39,6 @@ export default function PropertyForm({ initialData, onSubmit }: PropertyFormProp
     "Club House",
   ];
 
-  // Load initial data for edit mode
   useEffect(() => {
     if (initialData) {
       setAddress(initialData.address || "");
@@ -48,7 +48,7 @@ export default function PropertyForm({ initialData, onSubmit }: PropertyFormProp
       setFurnishingStatus(initialData.furnishingStatus || "Unfurnished");
       setAmenities(initialData.amenities || []);
       setDescription(initialData.description || "");
-      setPrice(initialData.price || 0);
+      setRent(initialData.rent || 0);
       setAvailabilityStatus(initialData.availabilityStatus ?? true);
       setPreviewImages(initialData.images || []);
     }
@@ -66,26 +66,26 @@ export default function PropertyForm({ initialData, onSubmit }: PropertyFormProp
 
   const handleAmenityToggle = (item: string) => {
     setAmenities((prev) =>
-      prev.includes(item)
-        ? prev.filter((a) => a !== item)
-        : [...prev, item]
+      prev.includes(item) ? prev.filter((a) => a !== item) : [...prev, item]
     );
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const formData = {
-      address,
-      socityName,
-      BHK,
-      area,
-      furnishingStatus,
-      amenities,
-      description,
-      price,
-      availabilityStatus,
-      images,
-    };
+
+    const formData = new FormData();
+    formData.append("address", address);
+    formData.append("socityName", socityName);
+    formData.append("BHK", BHK.toString());
+    formData.append("area", area.toString());
+    formData.append("furnishingStatus", furnishingStatus);
+    formData.append("description", description);
+    formData.append("availabilityStatus", availabilityStatus.toString());
+    formData.append("rent", rent.toString());
+    formData.append("amenities", JSON.stringify(amenities));
+
+    images.forEach((img) => formData.append("images", img));
+
     onSubmit(formData);
   };
 
@@ -178,14 +178,14 @@ export default function PropertyForm({ initialData, onSubmit }: PropertyFormProp
         />
       </div>
 
-      {/* Price */}
+      {/* Rent */}
       <div className="space-y-2">
-        <Label>Rent Price (₹)</Label>
+        <Label>Rent (₹)</Label>
         <Input
           type="number"
           min="0"
-          value={price}
-          onChange={(e) => setPrice(Number(e.target.value))}
+          value={rent}
+          onChange={(e) => setRent(Number(e.target.value))}
           required
         />
       </div>
@@ -220,9 +220,8 @@ export default function PropertyForm({ initialData, onSubmit }: PropertyFormProp
         )}
       </div>
 
-      {/* Submit */}
-      <Button type="submit" className="w-full">
-        {initialData ? "Update Property" : "Add Property"}
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading ? "Submitting..." : initialData ? "Update Property" : "Add Property"}
       </Button>
     </form>
   );

@@ -6,8 +6,8 @@ import generateJWTToken from "../utils/generateJWT.js";
 
 const adminRegister = async (req, res) => {
     try {
-        const { email, password, name, phone, userType } = req.body;
-        if (email && password && name && phone && userType === 'admin') {
+        const { email, password, userType } = req.body;
+        if (email && password && userType === 'admin') {
             const emailExists = await Admin.findOne({ email });
             if (emailExists) {
                 return res.status(400).send("Email already exists");

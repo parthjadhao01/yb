@@ -1,7 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import {
   Table,
   TableHeader,
@@ -15,40 +15,72 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Trash2, Edit, ArrowLeft, Plus } from "lucide-react";
 import Link from "next/link";
+import axios from "axios";
 
 type Property = {
-  id: string;
-  name: string;
-  rent: number;
-  bhk: number;
-  rented: boolean;
+  _id: string;
+  address: string;
+  socityName: string;
+  BHK: number;
+  area: number;
+  furnishingStatus: string;
+  amenities: string[];
+  description: string;
+  images: string[];
+  availabilityStatus: boolean;
+  price: number;
 };
 
 export default function MyPropertiesPage() {
   const router = useRouter();
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  // Dummy data
-  const [properties, setProperties] = useState<Property[]>([
-    { id: "p1", name: "Bandra West - 2BHK", rent: 45000, bhk: 2, rented: false },
-    { id: "p2", name: "Worli Sea View - 3BHK", rent: 85000, bhk: 3, rented: true },
-    { id: "p3", name: "Andheri Cozy - 1BHK", rent: 22000, bhk: 1, rented: false },
-    { id: "p4", name: "Powai Modern - 2BHK", rent: 38000, bhk: 2, rented: true },
-  ]);
+  // ✅ Fetch all landlord properties
+  const fetchProperties = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get("http://localhost:3000/api/landlord/getProperties", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      setProperties(res.data.properties);
+    } catch (error: any) {
+      console.error("Error fetching properties:", error);
+      alert("Failed to load properties");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const handleDelete = (id: string) => {
-    // simple confirm + remove from local state (replace with API call in real app)
-    if (confirm("Are you sure you want to delete this property?")) {
-      setProperties((prev) => prev.filter((p) => p.id !== id));
+  useEffect(() => {
+    fetchProperties();
+  }, []);
+
+  // ✅ Delete property
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this property?")) return;
+
+    try {
+      await axios.delete(`http://localhost:3000/api/landlord/deleteProperty/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      alert("Property deleted successfully!");
+      setProperties((prev) => prev.filter((p) => p._id !== id));
+    } catch (error: any) {
+      console.error("Error deleting property:", error);
+      alert("Failed to delete property");
     }
   };
 
   const handleEdit = (id: string) => {
-    // navigate to edit page (adjust route as needed)
-    router.push(`/my-properties/edit/${id}`);
+    router.push(`/landlord/myproperties/${id}`);
   };
 
   const handleAdd = () => {
-    // navigate to add property page
     router.push("/landlord/myproperties/addmyproperties");
   };
 
@@ -56,27 +88,22 @@ export default function MyPropertiesPage() {
     <div className="min-h-screen bg-background p-6">
       {/* Top bar */}
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <Button onClick={handleAdd} className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            <Link href="/landlord/myproperties/addmyproperties">
-              Add Property
-            </Link>
-          </Button>
-        </div>
+        <Button onClick={handleAdd} className="flex items-center gap-2">
+          <Plus className="h-4 w-4" />
+          Add Property
+        </Button>
 
-        <div>
-          <Button variant="ghost" onClick={() => router.back()} className="flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
-        </div>
+        <Button variant="ghost" onClick={() => router.back()} className="flex items-center gap-2">
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </Button>
       </div>
 
-      {/* Table container */}
       <div className="rounded-lg border bg-card">
         <Table>
-          <TableCaption>Your listed properties (dummy data)</TableCaption>
+          <TableCaption>
+            {loading ? "Loading properties..." : "Your listed properties"}
+          </TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead>Property Name</TableHead>
@@ -88,15 +115,17 @@ export default function MyPropertiesPage() {
           </TableHeader>
           <TableBody>
             {properties.map((prop) => (
-              <TableRow key={prop.id} className="hover:bg-muted/50">
-                <TableCell className="font-medium">{prop.name}</TableCell>
-                <TableCell>₹{prop.rent.toLocaleString()}</TableCell>
-                <TableCell>{prop.bhk} BHK</TableCell>
+              <TableRow key={prop._id} className="hover:bg-muted/50">
+                <TableCell className="font-medium">
+                  {prop.socityName} - {prop.address}
+                </TableCell>
+                <TableCell>₹{prop.price?.toLocaleString()}</TableCell>
+                <TableCell>{prop.BHK} BHK</TableCell>
                 <TableCell>
-                  {prop.rented ? (
-                    <Badge variant="destructive">Rented</Badge>
+                  {prop.availabilityStatus ? (
+                    <Badge>Available</Badge>
                   ) : (
-                    <Badge>Not Rented</Badge>
+                    <Badge variant="destructive">Rented</Badge>
                   )}
                 </TableCell>
                 <TableCell className="text-right">
@@ -104,7 +133,7 @@ export default function MyPropertiesPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => handleEdit(prop.id)}
+                      onClick={() => handleEdit(prop._id)}
                       className="flex items-center gap-2"
                     >
                       <Edit className="h-4 w-4" />
@@ -113,7 +142,7 @@ export default function MyPropertiesPage() {
                     <Button
                       size="sm"
                       variant="destructive"
-                      onClick={() => handleDelete(prop.id)}
+                      onClick={() => handleDelete(prop._id)}
                       className="flex items-center gap-2"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -124,10 +153,10 @@ export default function MyPropertiesPage() {
               </TableRow>
             ))}
 
-            {properties.length === 0 && (
+            {!loading && properties.length === 0 && (
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-6">
-                  No properties found. Click "Add Property" to create one.
+                  No properties found. Click “Add Property” to create one.
                 </TableCell>
               </TableRow>
             )}

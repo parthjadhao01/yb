@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const maintenancceRequestSchema = new mongoose.Schema({
   tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true },
   property: { type: mongoose.Schema.Types.ObjectId, ref: 'Property', required: true },
+  owner : { type: mongoose.Schema.Types.ObjectId, ref: 'Landlord', required: true },
   description: { type: String, required: true },
   status: { type: String, enum: ['Pending', 'In Progress', 'Completed'], default: 'Pending' },
   createdAt: { type: Date, default: Date.now },

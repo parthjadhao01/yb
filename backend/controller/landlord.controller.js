@@ -1,10 +1,41 @@
 import MaintenanceRequest from "../model/maintenance.model.js";
 import Request from "../model/request.model.js";
+import Landlord from "../model/landlord.model.js";
 
 // controller/landlord.controller.js
 import Property from "../model/property.model.js";
 import cloudinary from "../config/cloudinary.js";
 import streamifier from "streamifier";
+
+
+export const landlordProfile = async (req, res) => {
+  try {
+    const landlordId = req.user._id;
+    const landlord = await Landlord.findById(landlordId).select('-password');
+    if (!landlord) {
+      return res.status(404).json({ message: "Landlord not found" });
+    }
+    return res.status(200).json({ landlord });
+  } catch (error) {
+    console.error("Error fetching landlord profile:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export const updateLandlordProfile = async (req, res) => {
+  try {
+    const landlordId = req.user._id;
+    const updates = req.body;
+    const landlord = await Landlord.findByIdAndUpdate(landlordId, updates, { new: true }).select('-password');
+    if (!landlord) {
+      return res.status(404).json({ message: "Landlord not found" });
+    }
+    return res.status(200).json({ message: "Profile updated successfully", landlord });
+  } catch (error) {
+    console.error("Error updating landlord profile:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
 
 export const postProperty = async (req, res) => {
   try {

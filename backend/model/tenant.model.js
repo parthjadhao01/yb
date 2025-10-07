@@ -6,7 +6,8 @@ const tenantSchema = new mongoose.Schema({
   name : {type : String, required : true},
   phone : {type : String, required : true},
   maintenanceRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MaintenanceRequest' }],
-  rentRequest : [{ type: mongoose.Schema.Types.ObjectId, ref: 'Property' }]
+  rentRequest : [{ type: mongoose.Schema.Types.ObjectId, ref: 'Property' }],
+  emergencyContact : {type : String}
 });
 
 const Tenant = mongoose.model("Tenant", tenantSchema);

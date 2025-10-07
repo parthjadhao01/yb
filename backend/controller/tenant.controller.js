@@ -1,5 +1,35 @@
 import MaintenanceRequest from "../model/maintenance.model.js";
 import Request from "../model/request.model.js";
+import Tenant from "../model/tenant.model.js";
+
+
+export const tenantProfile = async (req,res)=>{
+    try {
+        const tenantId = req.user._id;
+        const tenant = await Tenant.findById(tenantId).select('-password');
+        if (!tenant) {
+            return res.status(404).send("Tenant not found");
+        }
+        return res.status(200).send(tenant);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send("Server Error : " + error.message);
+    }
+}
+
+export const updateTenantProfile = async (req,res)=>{
+    try {
+        const tenantId = req.user._id;
+        const updates = req.body;
+        const updatedTenant = await Tenant.findByIdAndUpdate(tenantId, updates, { new: true }).select('-password');
+        if (!updatedTenant) {
+            return res.status(404).send("Tenant not found");
+        }
+        return res.status(200).send({message : "Profile updated successfully", tenant : updatedTenant});
+    } catch (error) {
+        return res.status(500).send("Server Error");
+    }
+}
 
 export const getApplications = async (req, res) => {
     try {

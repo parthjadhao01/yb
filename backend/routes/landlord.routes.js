@@ -1,9 +1,13 @@
 import express from "express";
-import { postProperty,getProperties,deleteProperty,updateProperty,getTenantsApplications,updateApplicationStatus,getMaintenanceRequests,updateMaintenanceStatus } from "../controller/landlord.controller.js";
+import { postProperty,getProperties,deleteProperty,updateProperty,getTenantsApplications,updateApplicationStatus,getMaintenanceRequests,updateMaintenanceStatus,landlordProfile,updateLandlordProfile } from "../controller/landlord.controller.js";
 import { upload } from "../middleware/upload.middleware.js";
 import { landlordProtect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
+
+// all routes for geting landlord profile details
+router.get("/profile",landlordProfile)
+router.put("/profile",updateLandlordProfile)
 
 // all property routes here
 router.post("/postProperty", landlordProtect, upload.array("images"), postProperty);

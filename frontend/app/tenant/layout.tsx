@@ -30,7 +30,7 @@ export default function LandlordLayout({ children }: { children: React.ReactNode
                 <div className="border-b flex justify-between items-center px-4 py-2">
                     <SidebarTrigger />
                     <div className="w-45">
-                        <NavUser user={{ name: "John Doe", email: "john@example.com", avatar: "https://via.placeholder.com/150" }} />
+                        <NavUser userDetails={{ name: "John Doe", email: "john@example.com", avatar: "https://via.placeholder.com/150" ,id: "123" }} userType="tenant" />
                     </div>
                 </div>
                 {children}
